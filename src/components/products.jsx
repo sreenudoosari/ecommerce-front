@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { getProducts } from "../services/fakeProductService";
+import Like from "./common/like";
 class Products extends Component {
   state = {
-    products: getProducts(),
-    cartProducts: []
+    products: getProducts()
   };
 
   handleDeleteFromProducts = productToDelete => {
@@ -15,68 +15,97 @@ class Products extends Component {
   };
 
   handleAddProductToCart = productToAdd => {
-    const productsInCart = this.state.cartProducts;
-    if (productsInCart.indexOf(productToAdd) === -1) {
-      productsInCart.push(productToAdd);
-    }
-    this.setState({ cartProducts: productsInCart });
+    const products = [...this.state.products];
+    const index = products.indexOf(productToAdd);
+    products[index].numOfItemsInCart++;
+    this.setState({ products });
   };
 
   handleDeleteProductFromCart = productToDeleteFromCart => {
-    const productsInCart = this.state.cartProducts;
-    if (productsInCart.indexOf(productToDeleteFromCart) !== -1) {
-      productsInCart.pop(productToDeleteFromCart);
-    }
-    this.setState({ cartProducts: productsInCart });
+    const products = [...this.state.products];
+    const index = products.indexOf(productToDeleteFromCart);
+    products[index].numOfItemsInCart--;
+    this.setState({ products });
   };
+
+  getTotalNumOfItemsInCart() {
+    return this.state.products.reduce((a, c) => a + c.numOfItemsInCart, 0);
+  }
+
+  showNoProductsWarning(numOfProducts) {
+    if (numOfProducts === 0) {
+      return " No products found";
+    }
+  }
+
+  handleLike(likedProduct) {
+    const products = [...this.state.products];
+    const index = products.indexOf(likedProduct);
+    products[index].liked = !products[index].liked;
+    this.setState({ products });
+  }
 
   render() {
     const { length: count } = this.state.products;
-    if (count === 0) return <p>No Products to show </p>;
 
     return (
       <React.Fragment>
-        <button className="btn btn-primary">
-          Number of products in cart
+        <button className="btn btn-primary pull-right">
+          <i className="fa fa-shopping-cart" aria-hidden="true" />
           <span className="badge badge-light m-2">
-            {this.state.cartProducts.length}
+            {this.getTotalNumOfItemsInCart()}
           </span>
         </button>
         <table className="table">
-          <thead className="thead-dark">
+          <thead className="thead-light">
             <tr>
               <th>Image</th>
               <th>Name</th>
-              <th>Price</th>
+              <th>
+                Price <i className="fa fa-eur" aria-hidden="true" />
+              </th>
+              <th>Category</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
+            {this.showNoProductsWarning(count)}
             {this.state.products.map(product => (
               <tr key={product._id}>
                 <td>
-                  <img src={product.image} alt={product.name} />
+                  <img
+                    src={product.image}
+                    width={50}
+                    height={50}
+                    alt={product.name}
+                  />
                 </td>
                 <td>{product.name}</td>
                 <td>{product.price}</td>
+                <td>{product.category.name}</td>
                 <td>
                   <button
                     onClick={() => this.handleAddProductToCart(product)}
-                    className="btn btn-success m-2"
+                    className="btn btn-success"
                   >
-                    Add To Cart
+                    +
                   </button>
                   <button
                     onClick={() => this.handleDeleteProductFromCart(product)}
                     className="btn btn-warning m-2"
+                    disabled={product.numOfItemsInCart === 0 ? "disabled" : ""}
                   >
-                    Delete from Cart
+                    -
                   </button>
+                  <Like
+                    liked={product.liked}
+                    onClick={() => this.handleLike(product)}
+                  />
                   <button
                     onClick={() => this.handleDeleteFromProducts(product)}
-                    className="btn btn-danger"
+                    className="btn btn-danger m-2"
                   >
-                    Delete
+                    x
                   </button>
                 </td>
               </tr>
