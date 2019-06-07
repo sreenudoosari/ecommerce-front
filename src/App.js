@@ -1,7 +1,12 @@
 import React, { Component } from "react";
-import "./App.css";
+import { Route, Redirect, Switch } from "react-router-dom";
 import NavBar from "./components/navBar";
 import Products from "./components/products";
+import ProductDetails from "./components/productDetails";
+import Customers from "./components/customers";
+import Orders from "./components/orders";
+import NotFound from "./components/notFound";
+import "./App.css";
 
 class App extends Component {
   state = {
@@ -45,7 +50,15 @@ class App extends Component {
       <div>
         <NavBar totalCount={this.getTotalCount()} />
         <main className="container">
-          <Products />
+          <Switch>
+            <Route path="/customers" component={Customers} />
+            <Route path="/orders" component={Orders} />
+            <Route path="/products" exact component={Products} />
+            <Route path="/products/:id" component={ProductDetails} />
+            <Redirect from="/" exact to="/products" />
+            <Route path="/notFound" component={NotFound} />
+            <Redirect to="/notFound" />
+          </Switch>
         </main>
       </div>
     );
@@ -53,16 +66,3 @@ class App extends Component {
 }
 
 export default App;
-
-//Display
-
-//Table of products  (image (not from picsum , ))
-//get products information from  'fakeProductsService'
-
-//Actions
-
-//add to cart , delete from cart , Increment , Decrement
-//Empty Cart
-
-//Twitter comment : How do you feel learning react
-// @reactjs   @JavaScript  @SreenuDoosari

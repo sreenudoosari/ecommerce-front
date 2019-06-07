@@ -1,5 +1,6 @@
 import Like from "./common/like";
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 class ProductsTable extends Component {
   showNoProductsWarning(numOfProducts) {
     if (numOfProducts === 0) {
@@ -71,14 +72,18 @@ class ProductsTable extends Component {
             products.map(product => (
               <tr key={product._id}>
                 <td>
-                  <img
-                    src={product.image}
-                    width={50}
-                    height={50}
-                    alt={product.name}
-                  />
+                  <Link to={`/products/${product._id}`}>
+                    <img
+                      src={product.image}
+                      width={50}
+                      height={50}
+                      alt={product.name}
+                    />
+                  </Link>
                 </td>
-                <td>{product.name}</td>
+                <td>
+                  <Link to={`/products/${product._id}`}>{product.name}</Link>
+                </td>
                 <td>{product.price}</td>
                 <td>{product.category.name}</td>
                 <td>
