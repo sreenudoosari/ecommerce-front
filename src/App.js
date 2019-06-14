@@ -1,11 +1,15 @@
 import React, { Component } from "react";
 import { Route, Redirect, Switch } from "react-router-dom";
 import NavBar from "./components/navBar";
-import Products from "./components/products";
-import ProductDetails from "./components/productDetails";
+import Products from "./components/products/products";
+import AddProductForm from "./components/products/addProduct";
+import ProductDetails from "./components/products/productDetails";
 import Customers from "./components/customers";
 import Orders from "./components/orders";
 import NotFound from "./components/notFound";
+import LoginForm from "./components/loginForm";
+import RegisterForm from "./components/registerForm";
+
 import "./App.css";
 
 class App extends Component {
@@ -27,7 +31,6 @@ class App extends Component {
   };
 
   handleDelete = id => {
-    console.log("handle delete in countersssssssss.jsx :", id);
     const filteredCounters = this.state.counters.filter(c => c.id !== id);
     this.setState({ counters: filteredCounters });
   };
@@ -51,9 +54,12 @@ class App extends Component {
         <NavBar totalCount={this.getTotalCount()} />
         <main className="container">
           <Switch>
+            <Route path="/login" component={LoginForm} />
+            <Route path="/register" component={RegisterForm} />
             <Route path="/customers" component={Customers} />
             <Route path="/orders" component={Orders} />
             <Route path="/products" exact component={Products} />
+            <Route path="/products/new" exact component={AddProductForm} />
             <Route path="/products/:id" component={ProductDetails} />
             <Redirect from="/" exact to="/products" />
             <Route path="/notFound" component={NotFound} />

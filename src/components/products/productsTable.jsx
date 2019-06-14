@@ -1,6 +1,7 @@
-import Like from "./common/like";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import Like from "../common/like";
+
 class ProductsTable extends Component {
   showNoProductsWarning(numOfProducts) {
     if (numOfProducts === 0) {

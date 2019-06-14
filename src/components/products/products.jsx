@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import _ from "lodash";
-import { getProducts } from "../services/fakeProductService";
-import { getCategories } from "../services/fakeCategoryService";
-import Pagination from "./common/pagination";
-import ListGroup from "./common/listGroup";
-import { paginate } from "../utils/paginate";
+import { getProducts } from "../../services/fakeProductService";
+import { getCategories } from "../../services/fakeCategoryService";
+import Pagination from "../common/pagination";
+import ListGroup from "../common/listGroup";
+import { paginate } from "../../utils/paginate";
 import ProductsTable from "./productsTable";
-import Cart from "./common/cart";
+import Cart from "../common/cart";
+import SearchBox from "../common/searchBox";
 
 class Products extends Component {
   state = {
@@ -15,7 +16,8 @@ class Products extends Component {
     pageSize: 4,
     currentPage: 1,
     selectedCategory: { name: "All Categories" },
-    sortColumn: { colName: "name", order: "asc" }
+    sortColumn: { colName: "name", order: "asc" },
+    searchQuery: ""
   };
 
   componentDidMount() {
@@ -72,18 +74,49 @@ class Products extends Component {
     this.setState({ sortColumn });
   };
 
+  handleAddProduct = () => {
+    console.log("handle add product");
+    this.props.history.push("/products/new");
+  };
+
+  handleSearch = query => {
+    if (query) {
+      this.setState({
+        searchQuery: query,
+        selectedCategory: "",
+        currentPage: 1
+      });
+    } else {
+      this.setState({
+        searchQuery: query,
+        selectedCategory: { name: "All Categories" },
+        currentPage: 1
+      });
+    }
+  };
+
   getData = () => {
     const {
       products: allProducts,
       currentPage,
       selectedCategory,
       pageSize,
-      sortColumn
+      sortColumn,
+      searchQuery
     } = this.state;
-    //filter the products basing on category
-    const filteredProductsList = selectedCategory._id
-      ? allProducts.filter(p => p.category._id === selectedCategory._id)
-      : allProducts;
+
+    let filteredProductsList = allProducts;
+    if (searchQuery) {
+      filteredProductsList = allProducts.filter(p =>
+        p.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+    } else if (selectedCategory && selectedCategory._id) {
+      //filter the products basing on category
+      filteredProductsList = allProducts.filter(
+        p => p.category._id === selectedCategory._id
+      );
+    }
+
     //sort the products
     const sortedProducts = _.orderBy(
       filteredProductsList,
@@ -96,7 +129,7 @@ class Products extends Component {
   };
 
   render() {
-    const { currentPage, pageSize, sortColumn } = this.state;
+    const { currentPage, pageSize, sortColumn, searchQuery } = this.state;
     const result = this.getData();
     return (
       <div className="row">
@@ -109,6 +142,10 @@ class Products extends Component {
         </div>
         <div className="col">
           <Cart totalNumOfItems={this.getTotalNumOfItemsInCart()} />
+          <button onClick={this.handleAddProduct} className="btn btn-success">
+            Add Product
+          </button>
+          <SearchBox value={searchQuery} onChange={this.handleSearch} />
           <ProductsTable
             products={result.data}
             onAddToCart={this.handleAddProductToCart}

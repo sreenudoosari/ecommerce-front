@@ -7,3 +7,7 @@ export const categories = [
 export function getCategories() {
   return categories;
 }
+
+export function getSelectCategoriesList() {
+  return categories.map(c => ({ name: c.name, value: c._id }));
+}
