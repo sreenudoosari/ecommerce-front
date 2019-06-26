@@ -1,8 +1,9 @@
 import React from "react";
 import Joi from "joi-browser";
+import { toast } from "react-toastify";
+
 import Form from "../common/form";
-import { getSelectCategoriesList } from "../../services/fakeCategoryService";
-import * as productsService from "../../services/fakeProductService";
+import * as productsService from "../../services/productService";
 
 class AddProductForm extends Form {
   state = {
@@ -11,8 +12,16 @@ class AddProductForm extends Form {
       price: "",
       category: ""
     },
+    categories: [],
     errors: {}
   };
+  componentDidMount() {
+    const allCategories = this.props.location.state.categories;
+    const categories = allCategories
+      .filter(c => c._id)
+      .map(c => ({ name: c.name, value: c._id }));
+    this.setState({ categories });
+  }
   schema = {
     name: Joi.string()
       .required()
@@ -25,10 +34,12 @@ class AddProductForm extends Form {
       .label("Category")
   };
 
-  doSubmit = () => {
-    console.log("Calling the backend service with values :", this.state.data);
-    productsService.createProduct(this.state.data);
-    this.props.history.push("/products");
+  doSubmit = async () => {
+    const response = await productsService.createProduct(this.state.data);
+    if (response.status === 201) {
+      toast.success("Successfully created new product");
+      this.props.history.push("/products");
+    }
   };
 
   render() {
@@ -42,7 +53,7 @@ class AddProductForm extends Form {
             {this.renderSelect(
               "category",
               "Category",
-              getSelectCategoriesList(),
+              this.state.categories,
               true
             )}
             {this.renderButton("Save")}

@@ -1,7 +1,7 @@
 import React from "react";
 import Joi from "joi-browser";
-import * as productService from "../../services/fakeProductService";
-import { getSelectCategoriesList } from "../../services/fakeCategoryService";
+import { toast } from "react-toastify";
+import * as productService from "../../services/productService";
 import Form from "../common/form";
 
 class ProductDetails extends Form {
@@ -11,6 +11,7 @@ class ProductDetails extends Form {
       price: "",
       category: ""
     },
+    categories: [],
     errors: {}
   };
 
@@ -26,21 +27,30 @@ class ProductDetails extends Form {
       .label("Category")
   };
 
-  componentDidMount() {
-    const product = productService.getProductWithId(this.props.match.params.id);
-    if (!product) return this.props.history.replace("/not-found");
+  async componentDidMount() {
+    const response = await productService.getProductWithId(
+      this.props.match.params.id
+    );
+    if (!response) return this.props.history.replace("/not-found");
+    const { data: product } = response;
     const data = { ...this.state.data };
     data.name = product.name;
     data.price = product.price;
     data.category = product.category._id;
-    this.setState({ data });
+    const allCategories = this.props.location.categories;
+    const categories = allCategories
+      .filter(c => c._id)
+      .map(c => ({ name: c.name, value: c._id }));
+    this.setState({ data, categories });
   }
 
-  doSubmit = () => {
-    console.log("Calling the backend service  :", this.state.data);
+  doSubmit = async () => {
     const data = { id: this.props.match.params.id, ...this.state.data };
-    productService.updateProduct(data);
-    this.props.history.push("/products");
+    const response = await productService.updateProduct(data);
+    if (response.status === 200) {
+      toast.success("Successfully updated product");
+      this.props.history.push("/products");
+    }
   };
 
   render() {
@@ -53,7 +63,7 @@ class ProductDetails extends Form {
           {this.renderSelect(
             "category",
             "Category",
-            getSelectCategoriesList(),
+            this.state.categories,
             true
           )}
           {this.renderButton("Save")}

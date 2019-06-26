@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import _ from "lodash";
-import { getProducts } from "../../services/fakeProductService";
-import { getCategories } from "../../services/fakeCategoryService";
+import { toast } from "react-toastify";
+
+import * as productService from "../../services/productService";
+import { getCategories } from "../../services/categoryService";
 import Pagination from "../common/pagination";
 import ListGroup from "../common/listGroup";
 import { paginate } from "../../utils/paginate";
@@ -20,21 +22,26 @@ class Products extends Component {
     searchQuery: ""
   };
 
-  componentDidMount() {
-    const products = getProducts();
-    const categories = [
-      { _id: "", name: "All Categories" },
-      ...getCategories()
-    ];
-    this.setState({ products, categories });
+  async componentDidMount() {
+    const { data: products } = await productService.getProducts();
+    const allProducts = products.map(p => ({ ...p, numOfItemsInCart: 0 }));
+    const { data: categories } = await getCategories();
+    const allCategories = [{ _id: "", name: "All Categories" }, ...categories];
+    this.setState({ products: allProducts, categories: allCategories });
   }
 
-  handleDeleteFromProducts = productToDelete => {
+  handleDeleteFromProducts = async productToDelete => {
     const actualProducts = this.state.products;
     const filteredProducts = actualProducts.filter(
       product => product._id !== productToDelete._id
     );
     this.setState({ products: filteredProducts });
+    const response = await productService.deleteProduct(productToDelete._id);
+    if (response && response.status === 200) {
+      toast.success(`Successfully deleted ${productToDelete.name}.`);
+    } else {
+      this.setState({ products: actualProducts });
+    }
   };
 
   handleAddProductToCart = productToAdd => {
@@ -48,6 +55,7 @@ class Products extends Component {
     const products = [...this.state.products];
     const index = products.indexOf(productToDeleteFromCart);
     products[index].numOfItemsInCart--;
+
     this.setState({ products });
   };
 
@@ -75,8 +83,9 @@ class Products extends Component {
   };
 
   handleAddProduct = () => {
-    console.log("handle add product");
-    this.props.history.push("/products/new");
+    this.props.history.push("/products/new", {
+      categories: this.state.categories
+    });
   };
 
   handleSearch = query => {
@@ -129,7 +138,13 @@ class Products extends Component {
   };
 
   render() {
-    const { currentPage, pageSize, sortColumn, searchQuery } = this.state;
+    const {
+      currentPage,
+      pageSize,
+      sortColumn,
+      searchQuery,
+      categories
+    } = this.state;
     const result = this.getData();
     return (
       <div className="row">
@@ -154,6 +169,7 @@ class Products extends Component {
             onLike={this.handleLike}
             onSort={this.handleSort}
             sortColumn={sortColumn}
+            categories={categories}
           />
           <Pagination
             itemsCount={result.totalLength}

@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { Route, Redirect, Switch } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+
 import NavBar from "./components/navBar";
 import Products from "./components/products/products";
 import AddProductForm from "./components/products/addProduct";
@@ -10,48 +12,50 @@ import NotFound from "./components/notFound";
 import LoginForm from "./components/loginForm";
 import RegisterForm from "./components/registerForm";
 
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 class App extends Component {
-  state = {
-    counters: [
-      { id: 1, value: 0 },
-      { id: 2, value: 2 },
-      { id: 3, value: 4 },
-      { id: 4, value: 6 },
-      { id: 5, value: 8 }
-    ]
-  };
+  // state = {
+  //   counters: [
+  //     { id: 1, value: 0 },
+  //     { id: 2, value: 2 },
+  //     { id: 3, value: 4 },
+  //     { id: 4, value: 6 },
+  //     { id: 5, value: 8 }
+  //   ]
+  // };
 
-  handleIncrement = counter => {
-    const counters = [...this.state.counters];
-    const index = counters.indexOf(counter);
-    counters[index].value++;
-    this.setState({ counters });
-  };
+  // handleIncrement = counter => {
+  //   const counters = [...this.state.counters];
+  //   const index = counters.indexOf(counter);
+  //   counters[index].value++;
+  //   this.setState({ counters });
+  // };
 
-  handleDelete = id => {
-    const filteredCounters = this.state.counters.filter(c => c.id !== id);
-    this.setState({ counters: filteredCounters });
-  };
+  // handleDelete = id => {
+  //   const filteredCounters = this.state.counters.filter(c => c.id !== id);
+  //   this.setState({ counters: filteredCounters });
+  // };
 
-  handleReset = () => {
-    const resetCountersList = this.state.counters.map(c => {
-      c.value = 0;
-      return c;
-    });
-    console.log("handle reset : ", resetCountersList);
-    this.setState({ counters: resetCountersList });
-  };
+  // handleReset = () => {
+  //   const resetCountersList = this.state.counters.map(c => {
+  //     c.value = 0;
+  //     return c;
+  //   });
+  //   console.log("handle reset : ", resetCountersList);
+  //   this.setState({ counters: resetCountersList });
+  // };
 
-  getTotalCount() {
-    return this.state.counters.reduce((a, c) => a + c.value, 0);
-  }
+  // getTotalCount() {
+  //   return this.state.counters.reduce((a, c) => a + c.value, 0);
+  // }
 
   render() {
     return (
       <div>
-        <NavBar totalCount={this.getTotalCount()} />
+        <ToastContainer />
+        <NavBar />
         <main className="container">
           <Switch>
             <Route path="/login" component={LoginForm} />
@@ -60,7 +64,7 @@ class App extends Component {
             <Route path="/orders" component={Orders} />
             <Route path="/products" exact component={Products} />
             <Route path="/products/new" exact component={AddProductForm} />
-            <Route path="/products/:id" component={ProductDetails} />
+            <Route path="/products/:id" exact component={ProductDetails} />
             <Redirect from="/" exact to="/products" />
             <Route path="/notFound" component={NotFound} />
             <Redirect to="/notFound" />

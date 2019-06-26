@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-const NavBar = ({ totalCount }) => {
+const NavBar = () => {
   return (
     <>
       <nav className="navbar  navbar-expand-md navbar-dark bg-dark ">

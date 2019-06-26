@@ -41,7 +41,8 @@ class ProductsTable extends Component {
       onAddToCart,
       onDeleteFromCart,
       onDeleteFromTable,
-      onLike
+      onLike,
+      categories
     } = this.props;
     return (
       <table className="table">
@@ -73,9 +74,18 @@ class ProductsTable extends Component {
             products.map(product => (
               <tr key={product._id}>
                 <td>
-                  <Link to={`/products/${product._id}`}>
+                  <Link
+                    to={{
+                      pathname: `/products/${product._id}`,
+                      categories: categories
+                    }}
+                  >
                     <img
-                      src={product.image}
+                      src={
+                        product.image
+                          ? product.image
+                          : require("../../data/images/image-not-found.jpg")
+                      }
                       width={50}
                       height={50}
                       alt={product.name}
@@ -83,7 +93,14 @@ class ProductsTable extends Component {
                   </Link>
                 </td>
                 <td>
-                  <Link to={`/products/${product._id}`}>{product.name}</Link>
+                  <Link
+                    to={{
+                      pathname: `/products/${product._id}`,
+                      categories: categories
+                    }}
+                  >
+                    {product.name}
+                  </Link>
                 </td>
                 <td>{product.price}</td>
                 <td>{product.category.name}</td>
