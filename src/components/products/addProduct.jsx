@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 
 import Form from "../common/form";
 import * as productsService from "../../services/productService";
+import { getCategories } from "../../services/categoryService";
 
 class AddProductForm extends Form {
   state = {
@@ -15,8 +16,14 @@ class AddProductForm extends Form {
     categories: [],
     errors: {}
   };
-  componentDidMount() {
-    const allCategories = this.props.location.state.categories;
+  async componentDidMount() {
+    let allCategories = [];
+    if (this.props.location.state && this.props.location.state.categories) {
+      allCategories = this.props.location.state.categories;
+    } else {
+      const { data: categories } = await getCategories();
+      allCategories = categories;
+    }
     const categories = allCategories
       .filter(c => c._id)
       .map(c => ({ name: c.name, value: c._id }));
@@ -36,7 +43,7 @@ class AddProductForm extends Form {
 
   doSubmit = async () => {
     const response = await productsService.createProduct(this.state.data);
-    if (response.status === 201) {
+    if (response && response.status === 201) {
       toast.success("Successfully created new product");
       this.props.history.push("/products");
     }

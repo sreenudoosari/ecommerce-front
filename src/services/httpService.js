@@ -9,14 +9,20 @@ axios.interceptors.response.use(null, error => {
     error.response.status <= 500;
   if (unExpectedError) {
     logger.error(error);
-    toast.error("An Unexpected error occured :" + error);
+    toast.error("An error occured :" + error.response.data);
   }
 });
+
+//To avoid bidirectional dependency between httpService and authService
+function setJwt(jwt) {
+  axios.defaults.headers.common["x-auth-token"] = jwt;
+}
 
 export default {
   get: axios.get,
   post: axios.post,
   put: axios.put,
   patch: axios.patch,
-  delete: axios.delete
+  delete: axios.delete,
+  setJwt
 };

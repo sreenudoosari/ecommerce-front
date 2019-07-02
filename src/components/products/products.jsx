@@ -145,6 +145,7 @@ class Products extends Component {
       searchQuery,
       categories
     } = this.state;
+    const { user } = this.props;
     const result = this.getData();
     return (
       <div className="row">
@@ -157,9 +158,11 @@ class Products extends Component {
         </div>
         <div className="col">
           <Cart totalNumOfItems={this.getTotalNumOfItemsInCart()} />
-          <button onClick={this.handleAddProduct} className="btn btn-success">
-            Add Product
-          </button>
+          {user && user.isAdmin && (
+            <button onClick={this.handleAddProduct} className="btn btn-success">
+              Add Product
+            </button>
+          )}
           <SearchBox value={searchQuery} onChange={this.handleSearch} />
           <ProductsTable
             products={result.data}
@@ -170,6 +173,7 @@ class Products extends Component {
             onSort={this.handleSort}
             sortColumn={sortColumn}
             categories={categories}
+            user={user}
           />
           <Pagination
             itemsCount={result.totalLength}

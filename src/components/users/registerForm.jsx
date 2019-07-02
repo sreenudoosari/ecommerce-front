@@ -1,11 +1,12 @@
 import React from "react";
 import Joi from "joi-browser";
-import Form from "./common/form";
-
+import Form from "../common/form";
+import * as userService from "../../services/userService";
+import auth from "../../services/authService";
 class RegisterForm extends Form {
   state = {
     data: {
-      username: "",
+      email: "",
       password: "",
       name: ""
     },
@@ -13,10 +14,10 @@ class RegisterForm extends Form {
   };
 
   schema = {
-    username: Joi.string()
+    email: Joi.string()
       .email()
       .required()
-      .label("Username"),
+      .label("Email"),
     password: Joi.string()
       .min(5)
       .max(10)
@@ -27,8 +28,12 @@ class RegisterForm extends Form {
       .label("Name")
   };
 
-  doSubmit = () => {
-    console.log("Calling the backend service with values :", this.state.data);
+  doSubmit = async () => {
+    const response = await userService.register(this.state.data);
+    if (response && response.headers["x-auth-token"]) {
+      auth.loginWithJWT(response.headers["x-auth-token"]);
+      window.location = "/";
+    }
   };
 
   render() {
@@ -37,7 +42,7 @@ class RegisterForm extends Form {
         <h1>Register </h1>
         <div>
           <form onSubmit={this.handleSubmit}>
-            {this.renderInput("username", "Username", true, "text", true)}
+            {this.renderInput("email", "Email", true, "text", true)}
             {this.renderInput("password", "Password", false, "password", true)}
             {this.renderInput("name", "Name", false, "text", true)}
             {this.renderButton("Register")}

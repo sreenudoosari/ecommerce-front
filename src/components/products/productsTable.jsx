@@ -42,7 +42,8 @@ class ProductsTable extends Component {
       onDeleteFromCart,
       onDeleteFromTable,
       onLike,
-      categories
+      categories,
+      user
     } = this.props;
     return (
       <table className="table">
@@ -119,12 +120,16 @@ class ProductsTable extends Component {
                     -
                   </button>
                   <Like liked={product.liked} onClick={() => onLike(product)} />
-                  <button
-                    onClick={() => onDeleteFromTable(product)}
-                    className="btn btn-danger m-2"
-                  >
-                    x
-                  </button>
+                  {user && user.isAdmin && (
+                    <>
+                      <button
+                        onClick={() => onDeleteFromTable(product)}
+                        className="btn btn-danger m-2"
+                      >
+                        x
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))
