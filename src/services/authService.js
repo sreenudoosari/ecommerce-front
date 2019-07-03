@@ -1,12 +1,11 @@
 import http from "./httpService";
-import config from "../config.json";
 import jwtDecode from "jwt-decode";
 
 const tokenKey = "token";
 http.setJwt(getToken());
 
 function loginUrl() {
-  return config.apiUrl + "/auth";
+  return process.env.REACT_APP_API_URL + "/auth";
 }
 
 export async function login(email, password) {
