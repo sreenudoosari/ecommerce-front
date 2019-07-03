@@ -1,8 +1,7 @@
 import http from "./httpService";
-import config from "../config.json";
 
 function userUrl() {
-  return config.apiUrl + "/users";
+  return process.env.REACT_APP_API_URL + "/users";
 }
 
 export function register(user) {

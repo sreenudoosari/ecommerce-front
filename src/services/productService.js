@@ -1,8 +1,7 @@
 import http from "./httpService";
-import config from "../config.json";
 
 function productUrl(id) {
-  return config.apiUrl + "/products" + (id ? "/" + id : "");
+  return process.env.REACT_APP_API_URL + "/products" + (id ? "/" + id : "");
 }
 
 export function getProducts() {
